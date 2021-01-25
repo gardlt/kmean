@@ -56,8 +56,6 @@ class KMean():
                 cluster_distance = distance
                 cluster_index = c_index
 
-        print(f'Selected Cluster: {cluster_index}')
-        print(f'Distance to cluster centroid: {cluster_distance}')
         self.clusters[cluster_index].add_point(point)
 
     def assign_points_to_cluster(self):
@@ -92,3 +90,8 @@ class KMean():
             data[c_index]['centroid'] = self.clusters[c_index].centroid
 
         return data
+
+if __name__ == '__main__':
+    points = [(1.1, 2.5), (3.4, 1.9)]
+    k_mean = KMean(2, points)
+    print(k_mean.data_dump())
