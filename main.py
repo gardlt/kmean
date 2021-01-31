@@ -1,7 +1,7 @@
+from sklearn.cluster import KMeans
 from sklearn.datasets._samples_generator import make_blobs
-import matplotlib.pyplot as plt
-
 import math
+import matplotlib.pyplot as plt
 import numpy as np
 
 # Cluster assumptions
@@ -38,8 +38,11 @@ class Cluster():
         self.calculate_mean()
 
     def remove_point(self, index):
-        self.points.pop(index)
-        self.calculate_mean()
+        try:
+            self.points.pop(index)
+            self.calculate_mean()
+        except:
+            print(f'Failed to remove: {index}')
 
 class KMean():
     def __init__(self, number_clusters, points) -> None:
@@ -103,8 +106,6 @@ class KMean():
                     cluster_centroids = self.get_centroid_arr()
         return changed
 
-
-
     def create_clusters(self, number_clusters):
         rng = np.random.RandomState(2)
         i = rng.permutation(len(self.null_points))[:number_clusters]
@@ -145,9 +146,21 @@ class KMean():
         self.graph(centroids)
         return centroids
 
+def find_optimal_cluster_size(sample_size, data):
+    optimal_size = 0
+    for i in range(1, 11):
+        kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=0)
+        kmeans.fit(data)
+        if kmeans.inertia_ > sample_size:
+            optimal_size = i
+        else:
+            return optimal_size
+
 if __name__ == '__main__':
-    clusters = 4
-    for sample_size in [10, 20, 100]:
-        data, _ = make_blobs(n_samples=sample_size, centers=clusters)
-        k_mean = KMean(clusters, data)
-        k_mean.data_dump()
+    sample_size = 1000
+    data, _ = make_blobs(n_samples=sample_size, cluster_std=0.60, random_state=0)
+    cluster_size = find_optimal_cluster_size(sample_size, data)
+    print(cluster_size)
+
+    k_mean = KMean(cluster_size, data)
+    k_mean.data_dump()
